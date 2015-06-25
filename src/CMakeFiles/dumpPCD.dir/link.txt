@@ -1,0 +1,1 @@
+/usr/bin/c++     -Wno-deprecated     CMakeFiles/dumpPCD.dir/customPCD.cpp.o  -o dumpPCD -rdynamic -lpcl_common -lpcl_io -lpcl_kdtree -lpcl_visualization -lpcl_search -lboost_filesystem -lboost_system 
