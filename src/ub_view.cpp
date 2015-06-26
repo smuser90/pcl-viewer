@@ -1,10 +1,27 @@
 #include "ub_view.h"
 
+
 cv::Mat src1, src2, dst;
-Eigen::Matrix4f ub_camera;
+pcl::visualization::Camera ub_camera;
+Eigen::Matrix4f ub_movement;
 const int alpha_slider_max = 100;
 int alpha_slider;
 double alpha, beta;
+
+/*
+void update_camera(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer){
+  viewer->setCameraPosition(ub_movement(0,0) + ub_camera.pos[0],
+      ub_movement(0,1) + ub_camera.pos[1],
+      ub_movement(0,2) + ub_camera.pos[2],
+      ub_camera.focal[0],  ub_camera.focal[1],   ub_camera.focal[2],
+      ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
+
+  viewer->getCameraParameters (ub_camera); // Keep camera fresh
+
+  for(int idx = 0; idx < 3; idx++)
+    ub_movement(0, idx) = 0;
+}
+*/
 
 int
 main (int argc, char** argv)
@@ -24,48 +41,22 @@ main (int argc, char** argv)
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
   cloud = (pcl::PointCloud<pcl::PointXYZ>::ConstPtr) &cloud_mem;
 
-  pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
-  pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
-  pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
-
-  tree->setInputCloud(cloud);
-  n.setInputCloud (cloud);
-  n.setSearchMethod (tree);
-  n.setKSearch(20);
-  n.compute (*normals);
-
-  pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud (new pcl::PointCloud<pcl::PointNormal>);
-  pcl::concatenateFields (*cloud, *normals, *normal_cloud);
-
-  pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
-  tree2->setInputCloud (normal_cloud);
-
-  pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
-  pcl::PolygonMesh triangles;
-
-  gp3.setSearchRadius(0.05);
-  gp3.setMu (2.5);
-  gp3.setMaximumNearestNeighbors (200);
-  gp3.setMaximumSurfaceAngle(M_PI / 4);
-  gp3.setMinimumAngle(M_PI / 18);
-  gp3.setMaximumAngle(2 * M_PI / 3);
-  gp3.setNormalConsistency(false);
-
-  gp3.setInputCloud (normal_cloud);
-  gp3.setSearchMethod (tree2);
-  gp3.reconstruct (triangles);
+  pcl::PolygonMesh mesh;
+  cloud_to_mesh(cloud, mesh);
 
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
   viewer->setBackgroundColor( 0, 0, 0);
 
   //pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
   //viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
-  viewer->addPolygonMesh( triangles, "Model");
+  viewer->addPolygonMesh( mesh, "Model");
   viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();
   viewer->setCameraPosition(0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  viewer->registerKeyboardCallback(keyboard_handler, (void *)&viewer);
+  viewer->getCameraParameters (ub_camera);
 
   cv::namedWindow("Ub-GUI", 1);
 
@@ -74,9 +65,13 @@ main (int argc, char** argv)
   cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
 
   while (!viewer->wasStopped ()){
-    on_trackbar( alpha_slider, 0);
+    //on_trackbar( alpha_slider, 0);
+
+    //update_camera(viewer);
+
     viewer->spinOnce(100);
-    boost::this_thread::sleep (boost::posix_time::microseconds ( 100000));
+
+    boost::this_thread::sleep (boost::posix_time::microseconds ( 10000));
   }
 
   return EXIT_SUCCESS;

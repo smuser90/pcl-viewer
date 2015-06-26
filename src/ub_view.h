@@ -33,9 +33,12 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 #define BYTE 8
+#define STEP 0.3
 
 // Globals (god forgive me)
-extern Eigen::Matrix4f ub_camera;
+extern pcl::visualization::Camera ub_camera;
+extern Eigen::Matrix4f ub_movement;
+
 extern const int alpha_slider_max;
 extern int alpha_slider;
 extern double alpha, beta;
@@ -43,6 +46,9 @@ extern cv::Mat src1, src2, dst;
 
 // GUI
 void on_trackbar( int as, void* p);
+
+// Controls
+void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer);
 
 // util
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
@@ -57,6 +63,13 @@ void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud);
 
 void reduce_to_unit(float &x, float &y, float &z);
 void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, float x, float y, float z);
+
+void estimate_normals(pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> &extract_normals,
+  pcl::PointCloud<pcl::Normal>::Ptr normals, pcl::search::KdTree<pcl::PointXYZ>::Ptr tree);
+
+void stitch_mesh(pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud, pcl::PolygonMesh &triangles);
+
+void cloud_to_mesh(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, pcl::PolygonMesh &mesh);
 
 // tests
 void pack_unpack_test(void);
