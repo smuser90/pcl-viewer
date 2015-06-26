@@ -32,12 +32,23 @@ main (int argc, char** argv)
   pcl::PointCloud<pcl::PointXYZRGB> cloud_mem;
 
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
-  uint8_t clr[3] = {0, 240, 0};
+  cloud = (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr) &cloud_mem;
+
+  pcl::PointXYZRGB max, min;
+  pcl::getMinMax3D( cloud_mem, min, max);
+
+  float range = max.y - min.y;
+  uint8_t clr_max[3] = {255, 0, 0};
+  uint8_t clr_min[3] = {0, 255, 0};
+  uint8_t clr[3] = {0, 0, 0};
   for(int pt = 0; pt < cloud_mem.size(); pt++){
+
+    float percent_range = ((max.y - cloud_mem.points[pt].y) / range);
+    clr[0] = clr_max[0] * percent_range;
+    clr[1] = clr_min[1] * (1-percent_range);
+
     pack_rgb( &cloud_mem.points[pt], clr);
   }
-
-  cloud = (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr) &cloud_mem;
   pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
 
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
@@ -49,14 +60,11 @@ main (int argc, char** argv)
   viewer->initCameraParameters();
   viewer->setCameraPosition(0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-  printf("Creating window");
   cv::namedWindow("Ub-GUI", 1);
 
   char TrackbarName[50];
   sprintf( TrackbarName, "Alpha : %d", alpha_slider);
-  cv::createTrackbar("Hello Buttons", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
-
-
+  cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
 
   while (!viewer->wasStopped ()){
     on_trackbar( alpha_slider, 0);
