@@ -1,20 +1,28 @@
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+
 project(Uber_Viewer)
 
-find_package(VTK REQUIRED)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
 
+find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree visualization search)
+find_package(OpenCV REQUIRED)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_ADDITIONAL_VERSIONS "1.44" "1.44.0")
+
 find_package(Boost COMPONENTS thread date_time program_options filesystem system REQUIRED)
 find_package(Threads REQUIRED)
 
-include_directories(${PCL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(${PCL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 link_directories(${PCL_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+
 add_definitions(${PCL_DEFINITIONS})
 add_definitions(${BOOST_THREAD_USE_LIB})
+
 add_executable(ub-view ${SUBSYS_NAME} UberXYZ_RGB.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp )
+
 target_link_libraries(ub-view pcl_common pcl_io pcl_kdtree pcl_visualization pcl_search ${Boost_LIBRARIES}
-  libvtkCommon.so libvtkFiltering.so libvtkRendering.so)
+  libvtkCommon.so libvtkFiltering.so libvtkRendering.so ${OpenCV_LIBS})

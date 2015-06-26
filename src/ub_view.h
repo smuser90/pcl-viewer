@@ -1,7 +1,7 @@
 #ifndef UBVIEW_H
 #define UBVIEW_H
 
-// PCL
+// Point Cloud Library
 #include <pcl/common/common.h>
 #include <pcl/common/transforms.h>
 
@@ -10,6 +10,11 @@
 
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/visualization/pcl_visualizer.h>
+
+// OpenCV
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 // BOOST
 #include <boost/thread/thread.hpp>
