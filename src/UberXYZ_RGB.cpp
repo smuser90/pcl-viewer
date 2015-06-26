@@ -8,10 +8,18 @@ void pack_rgb(UberXYZ_RGB *p, uint8_t rgb[3]){
 	p->rgb = *reinterpret_cast<float*>(&rgb_mask); // Type coursion int -> float
 }
 
-// Unpack routine TODO: break these into utils file
+// Unpack routine
 void unpack_rgb(UberXYZ_RGB *p, uint8_t (&rgb)[3]){
+  //printf("RGB Before: %f\n", p->rgb);
   uint32_t rgb_mask = *reinterpret_cast<uint32_t*>(&p->rgb);
   rgb[0] = (uint8_t)(rgb_mask >> 2 * BYTE);
   rgb[1] = (uint8_t)(rgb_mask >> BYTE);
   rgb[2] = (uint8_t)(rgb_mask);
+  //printf("RGB After: %f\n", p->rgb);
+}
+
+void set_xyz(UberXYZ_RGB *p, float x, float y, float z){
+  p->x = x;
+  p->y = y;
+  p->z = z;
 }
