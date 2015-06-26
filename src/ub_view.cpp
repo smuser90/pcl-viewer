@@ -24,33 +24,18 @@ main (int argc, char** argv)
 {
   //pack_unpack_test();
   //binary_pcd_test();
-  
+
   src1 = cv::imread("../viz.jpg");
   src2 = cv::imread("../rocket.jpg");
 
-  pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud;
-  pcl::PointCloud<pcl::PointXYZ> cloud_mem;
+  pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud;   // Most functions seem to want a const ptr
+  pcl::PointCloud<pcl::PointXYZ> cloud_mem;         // Allocate on stack for now.
+
+  pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud_rgb;
+  pcl::PointCloud<pcl::PointXYZRGB> cloud_rgbmem;
 
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
   cloud = (pcl::PointCloud<pcl::PointXYZ>::ConstPtr) &cloud_mem;
-
-/*
-  pcl::PointXYZRGB max, min;
-  pcl::getMinMax3D( cloud_mem, min, max);
-
-  float range = max.y - min.y;
-  uint8_t clr_max[3] = {255, 0, 0};
-  uint8_t clr_min[3] = {0, 255, 0};
-  uint8_t clr[3] = {0, 0, 0};
-  for(int pt = 0; pt < cloud_mem.size(); pt++){
-
-    float percent_range = ((max.y - cloud_mem.points[pt].y) / range);
-    clr[0] = clr_max[0] * percent_range;
-    clr[1] = clr_min[1] * (1-percent_range);
-
-    pack_rgb( &cloud_mem.points[pt], clr);
-  }
-  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud); */
 
   pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
   pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
@@ -83,15 +68,13 @@ main (int argc, char** argv)
   gp3.setSearchMethod (tree2);
   gp3.reconstruct (triangles);
 
-
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
   viewer->setBackgroundColor( 0, 0, 0);
 
+  //pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
   //viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
   viewer->addPolygonMesh( triangles, "Model");
   viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
-
-
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();

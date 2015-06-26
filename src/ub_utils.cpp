@@ -6,6 +6,25 @@ void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
     set_xyz(&cloud->points[pt], 0, 0, 0);
 }
 
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud){
+  pcl::PointXYZRGB max, min;
+  pcl::getMinMax3D( cloud, min, max);
+
+  float range = max.y - min.y;
+  uint8_t clr_max[3] = {255, 0, 0};
+  uint8_t clr_min[3] = {0, 255, 0};
+  uint8_t clr[3] = {0, 0, 0};
+
+  for(int pt = 0; pt < cloud.size(); pt++){
+
+    float percent_range = ((max.y - cloud.points[pt].y) / range);
+    clr[0] = clr_max[0] * percent_range;
+    clr[1] = clr_min[1] * (1 - percent_range);
+
+    pack_rgb( &cloud.points[pt], clr);
+  }
+}
+
 void print_point(pcl::PointXYZRGB *p){
   uint8_t rgb[3] = {0,0,0};
   unpack_rgb(p, rgb); // populate colors

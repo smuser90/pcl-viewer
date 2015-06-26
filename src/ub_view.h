@@ -63,6 +63,8 @@ void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
 void print_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
 void print_point(pcl::PointXYZRGB *p);
 
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud);
+
 void reduce_to_unit(float &x, float &y, float &z);
 void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, float x, float y, float z);
 
