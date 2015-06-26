@@ -24,16 +24,17 @@ main (int argc, char** argv)
 {
   //pack_unpack_test();
   //binary_pcd_test();
-
+  
   src1 = cv::imread("../viz.jpg");
   src2 = cv::imread("../rocket.jpg");
 
-  pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud;
-  pcl::PointCloud<pcl::PointXYZRGB> cloud_mem;
+  pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud;
+  pcl::PointCloud<pcl::PointXYZ> cloud_mem;
 
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
-  cloud = (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr) &cloud_mem;
+  cloud = (pcl::PointCloud<pcl::PointXYZ>::ConstPtr) &cloud_mem;
 
+/*
   pcl::PointXYZRGB max, min;
   pcl::getMinMax3D( cloud_mem, min, max);
 
@@ -49,13 +50,49 @@ main (int argc, char** argv)
 
     pack_rgb( &cloud_mem.points[pt], clr);
   }
-  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud); */
+
+  pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
+  pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+  pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+
+  tree->setInputCloud(cloud);
+  n.setInputCloud (cloud);
+  n.setSearchMethod (tree);
+  n.setKSearch(20);
+  n.compute (*normals);
+
+  pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud (new pcl::PointCloud<pcl::PointNormal>);
+  pcl::concatenateFields (*cloud, *normals, *normal_cloud);
+
+  pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
+  tree2->setInputCloud (normal_cloud);
+
+  pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
+  pcl::PolygonMesh triangles;
+
+  gp3.setSearchRadius(0.05);
+  gp3.setMu (2.5);
+  gp3.setMaximumNearestNeighbors (200);
+  gp3.setMaximumSurfaceAngle(M_PI / 4);
+  gp3.setMinimumAngle(M_PI / 18);
+  gp3.setMaximumAngle(2 * M_PI / 3);
+  gp3.setNormalConsistency(false);
+
+  gp3.setInputCloud (normal_cloud);
+  gp3.setSearchMethod (tree2);
+  gp3.reconstruct (triangles);
+
 
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
   viewer->setBackgroundColor( 0, 0, 0);
 
-  viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
-  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model Cloud");
+  //viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
+  viewer->addPolygonMesh( triangles, "Model");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
+
+
+
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();
   viewer->setCameraPosition(0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);

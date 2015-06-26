@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Eigen3 REQUIRED)
-find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree visualization search)
+find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree visualization search features surface)
 find_package(OpenCV REQUIRED)
 
 
@@ -28,5 +28,5 @@ add_definitions(${BOOST_THREAD_USE_LIB})
 
 add_executable(ub-view ${SUBSYS_NAME} UberXYZ_RGB.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp )
 
-target_link_libraries(ub-view pcl_common pcl_io pcl_kdtree pcl_visualization pcl_search ${Boost_LIBRARIES}
+target_link_libraries(ub-view ${PCL_LIBRARIES} ${Boost_LIBRARIES}
   libvtkCommon.so libvtkFiltering.so libvtkRendering.so ${OpenCV_LIBS} ${OPENNI_LIBRARIES})
