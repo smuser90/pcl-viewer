@@ -1,23 +1,10 @@
 #include "ub_view.h"
 
+cv::Mat src1, src2, dst;
+Eigen::Matrix4f ub_camera;
 const int alpha_slider_max = 100;
 int alpha_slider;
 double alpha, beta;
-
-cv::Mat src1, src2, dst;
-
-void on_trackbar( int as, void* p){
-  alpha = (double) alpha_slider / alpha_slider_max;
-  beta = (1.0 - alpha);
-
-  cv::addWeighted( src1, alpha, src2, beta, 0.0, dst );
-
-  cv::imshow( "Ub-GUI", dst);
-  int key = cv::waitKey(50);
-
-  if(key == 27)
-    exit(EXIT_SUCCESS);
-}
 
 int
 main (int argc, char** argv)

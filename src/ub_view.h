@@ -32,47 +32,37 @@
 #include <iostream>
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
+#define BYTE 8
 
-Eigen::vector4f camera;
-/* Following Boilerplate largely copy pasta'd from pointclouds.org */
-struct UberXYZ_RGB
-{
-  uint32_t id;
-  PCL_ADD_POINT4D;                  // preferred way of adding a XYZ+padding
-  float rgb;
-  float nx;                         // normal unit vector
-  float ny;
-  float nz;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW   // make sure our new allocators are aligned
-} EIGEN_ALIGN16;                    // enforce SSE padding for correct memory alignment
+// Globals (god forgive me)
+extern Eigen::Matrix4f ub_camera;
+extern const int alpha_slider_max;
+extern int alpha_slider;
+extern double alpha, beta;
+extern cv::Mat src1, src2, dst;
 
-POINT_CLOUD_REGISTER_POINT_STRUCT (UberXYZ_RGB,
-                                   (float, x, x)
-                                   (float, y, y)
-                                   (float, z, z)
-                                   (float, rgb, rgb)
-)
+// GUI
+void on_trackbar( int as, void* p);
 
-//UberXYZ_RGB Dot Data
-void pack_rgb(pcl::PointXYZRGB *p, uint8_t rgb[3]);
-void unpack_rgb(pcl::PointXYZRGB *p, uint8_t (&rgb)[3]);
-void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
-
-//util
+// util
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
 void print_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
 void print_point(pcl::PointXYZRGB *p);
+
+void pack_rgb(pcl::PointXYZRGB *p, uint8_t rgb[3]);
+void unpack_rgb(pcl::PointXYZRGB *p, uint8_t (&rgb)[3]);
+void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
 
 void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud);
 
 void reduce_to_unit(float &x, float &y, float &z);
 void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, float x, float y, float z);
 
-//tests
+// tests
 void pack_unpack_test(void);
 void binary_pcd_test(void);
 
-//globals
+// globals
 static uint8_t colors[5][3] = {
   {255, 128, 0},
   {0, 255, 128},
