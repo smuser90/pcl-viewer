@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
 
 project(Uber_Viewer)
 
+include(FindPkgConfig)
+pkg_check_modules(OPENNI libopenni)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED COMPONENTS common io kdtree visualization search)
 find_package(OpenCV REQUIRED)
+
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -25,4 +29,4 @@ add_definitions(${BOOST_THREAD_USE_LIB})
 add_executable(ub-view ${SUBSYS_NAME} UberXYZ_RGB.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp )
 
 target_link_libraries(ub-view pcl_common pcl_io pcl_kdtree pcl_visualization pcl_search ${Boost_LIBRARIES}
-  libvtkCommon.so libvtkFiltering.so libvtkRendering.so ${OpenCV_LIBS})
+  libvtkCommon.so libvtkFiltering.so libvtkRendering.so ${OpenCV_LIBS} ${OPENNI_LIBRARIES})
