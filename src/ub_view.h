@@ -6,7 +6,12 @@
 #include <pcl/common/transforms.h>
 
 #include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 #include <pcl/io/pcd_io.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/surface/gp3.h>
 
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -28,6 +33,7 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 
+Eigen::vector4f camera;
 /* Following Boilerplate largely copy pasta'd from pointclouds.org */
 struct UberXYZ_RGB
 {
