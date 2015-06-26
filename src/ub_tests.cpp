@@ -3,14 +3,14 @@
 #define PACKINGPOINTS 5
 
 void pack_unpack_test(void){
-  pcl::PointCloud<UberXYZ_RGB> cloud;
+  pcl::PointCloud<pcl::PointXYZRGB> cloud;
   cloud.points.resize (PACKINGPOINTS);
   cloud.width = PACKINGPOINTS;
   cloud.height = 1;
 
   //Initialize cloud
   for(int pt = 0; pt < cloud.size(); pt++){
-    cloud.points[pt].id = pt+100;
+    //cloud.points[pt].id = pt+100;
     set_xyz(&cloud.points[pt], pt+1, pt+1, pt+1);
     pack_rgb(&cloud.points[pt] , colors[pt % ARRAY_LENGTH(colors)]);
   }
@@ -23,13 +23,12 @@ void pack_unpack_test(void){
   pcl::io::loadPCDFile ("pack_unpack.pcd", cloud);
 
   for(int pt = 0; pt < cloud.size(); pt++){
-    printf("RGB Before: %f\n", cloud.points[pt].rgb);
     print_point(&cloud.points[pt]);
   }
 }
 
 void binary_pcd_test(void){
-  pcl::PointCloud<UberXYZ_RGB> cloud;
+  pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
   // Load binary encoded non-rgb point cloud
   pcl::io::loadPCDFile ("../model.pcd", cloud);

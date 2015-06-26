@@ -1,17 +1,23 @@
 #ifndef UBVIEW_H
 #define UBVIEW_H
 
-#include <pcl/point_cloud.h>
-#include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/io/pcd_io.h>
 #include <pcl/common/common.h>
+
+#include <pcl/point_cloud.h>
+#include <pcl/io/pcd_io.h>
 
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/visualization/pcl_visualizer.h>
-#include <vtkPolyDataReader.h>
 
-#include <iostream>
 #include <boost/thread/thread.hpp>
+
+// STDLIB
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cfloat>
+#include <iostream>
+
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 
@@ -35,15 +41,14 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (UberXYZ_RGB,
 )
 
 //UberXYZ_RGB Dot Data
-void pack_rgb(UberXYZ_RGB *p, uint8_t rgb[3]);
-void unpack_rgb(UberXYZ_RGB *p, uint8_t (&rgb)[3]);
-void set_xyz(UberXYZ_RGB *p, float x, float y, float z);
-void set_nxyz(UberXYZ_RGB *p, float x, float y, float z);
+void pack_rgb(pcl::PointXYZRGB *p, uint8_t rgb[3]);
+void unpack_rgb(pcl::PointXYZRGB *p, uint8_t (&rgb)[3]);
+void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
 
 //util
-void clear_cloud(pcl::PointCloud<UberXYZ_RGB> *cloud);
-void print_cloud(pcl::PointCloud<UberXYZ_RGB> *cloud);
-void print_point(UberXYZ_RGB *p);
+void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
+void print_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
+void print_point(pcl::PointXYZRGB *p);
 
 //tests
 void pack_unpack_test(void);
