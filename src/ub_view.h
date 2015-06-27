@@ -25,6 +25,7 @@
 
 // BOOST
 #include <boost/thread/thread.hpp>
+#include <boost/timer/timer.hpp>
 
 //VTK
 #include <vtkRenderWindow.h>
@@ -36,11 +37,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <cfloat>
+#include <cmath>
 #include <iostream>
+
+// Linux
+#include <sys/time.h>
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 #define BYTE 8
 #define STEP 0.005
+#define PRESSPERSEC 15
 
 // Globals
 extern pcl::visualization::Camera ub_camera;
@@ -56,6 +62,8 @@ extern int alpha_slider;
 extern double alpha, beta;
 extern cv::Mat src1, src2, dst;
 
+extern struct timeval last_press[10];
+
 void color_mesh( void);
 
 // GUI
@@ -63,6 +71,7 @@ void on_trackbar( int as, void* p);
 
 // Controls
 void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer);
+void init_timers(void);
 
 // Camera
 void camera_move(char vec, int dir);

@@ -87,9 +87,3 @@ void camera_move(char vec, int dir){
       break;
   }
 }
-
-
-
-
-
-//()

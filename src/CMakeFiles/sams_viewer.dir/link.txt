@@ -1,1 +1,0 @@
-/usr/bin/c++     -Wno-deprecated     CMakeFiles/sams_viewer.dir/my_viewer.cpp.o  -o sams_viewer -rdynamic -lpcl_common -lpcl_io -lpcl_kdtree -lpcl_visualization -lpcl_search -lboost_filesystem -lboost_system 
