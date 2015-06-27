@@ -123,6 +123,7 @@ void stitch_mesh(pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud, pcl::Polyg
   stitch.setSearchMethod (tree2);
   stitch.reconstruct (triangles);
 }
+
 void cloud_to_mesh(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, pcl::PolygonMesh &mesh){
 
   pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> extract_normals;

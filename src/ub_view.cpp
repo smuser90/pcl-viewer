@@ -5,6 +5,7 @@ cv::Mat src1, src2, dst;
 pcl::visualization::Camera ub_camera;
 Eigen::Matrix4f ub_movement;
 
+boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 
 const int alpha_slider_max = 100;
 int alpha_slider;
@@ -32,20 +33,33 @@ main (int argc, char** argv)
   pcl::PointCloud<pcl::PointXYZRGB> cloud_rgbmem;
 
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
+
   cloud = (pcl::PointCloud<pcl::PointXYZ>::ConstPtr) &cloud_mem;
+  pcl::copyPointCloud(cloud_mem, cloud_rgbmem);
+
+  heat_map(cloud_rgbmem);
+  cloud_rgb = (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr) &cloud_rgbmem;
 
   cloud_to_mesh(cloud, mesh);
 
   pcl::VTKUtils::convertToVTK(mesh, raw_mesh);
 
-  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
-  viewer->setBackgroundColor( 0, 0, 0);
+  viewer = boost::shared_ptr<pcl::visualization::PCLVisualizer>(new pcl::visualization::PCLVisualizer("Uber View"));
 
-  //pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
-  //viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
-  //viewer->addPolygonMesh( mesh, "Model");
-  //viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
+  viewer->setBackgroundColor( 0.2, 0.3, 0.4);
 
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud_rgb);
+  viewer->addPointCloud<pcl::PointXYZRGB>(cloud_rgb, rgb, "Model Cloud");
+
+  printf("Acquiring PCL's vtkrenderwindow\n");
+  vtkSmartPointer<vtkRenderWindow> vtkrender_window = viewer->getRenderWindow();
+  vtkSmartPointer<vtkRenderer> vtkrenderer = vtkrender_window->GetRenderers()->GetFirstRenderer();
+
+  printf("Visible Actor Count: %d\n", vtkrenderer->VisibleActorCount());
+  fflush(stdout);
+
+  viewer->addPolygonMesh( mesh, "Model");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();
@@ -53,12 +67,12 @@ main (int argc, char** argv)
   viewer->registerKeyboardCallback(keyboard_handler, (void *)&viewer);
   viewer->getCameraParameters (ub_camera);
 
-  cv::namedWindow("Ub-GUI", 1);
+  //cv::namedWindow("Ub-GUI", 1);
 
-  char TrackbarName[50];
-  sprintf( TrackbarName, "Alpha : %d", alpha_slider);
-  cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
-  on_trackbar( alpha_slider, 0);
+  //char TrackbarName[50];
+  //sprintf( TrackbarName, "Alpha : %d", alpha_slider);
+  //cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
+  //on_trackbar( alpha_slider, 0);
 
   while (!viewer->wasStopped ()){
 
