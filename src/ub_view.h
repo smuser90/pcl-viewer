@@ -33,7 +33,7 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 #define BYTE 8
-#define STEP 0.3
+#define STEP 0.01
 
 // Globals (god forgive me)
 extern pcl::visualization::Camera ub_camera;

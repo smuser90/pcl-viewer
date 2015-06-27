@@ -54,7 +54,7 @@ main (int argc, char** argv)
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();
-  viewer->setCameraPosition(0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  viewer->setCameraPosition(0.0, 0.0, 2.0, 0, 0.2, 0, 0.0, 1.0, 0.0);
   viewer->registerKeyboardCallback(keyboard_handler, (void *)&viewer);
   viewer->getCameraParameters (ub_camera);
 
