@@ -56,10 +56,18 @@ main (int argc, char** argv)
   vtkSmartPointer<vtkRenderer> vtkrenderer = vtkrender_window->GetRenderers()->GetFirstRenderer();
 
   printf("Visible Actor Count: %d\n", vtkrenderer->VisibleActorCount());
+
+  vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  mapper->SetInput(raw_mesh);
+
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+  actor->SetMapper(mapper);
+  vtkrenderer->AddActor(actor);
+
   fflush(stdout);
 
-  viewer->addPolygonMesh( mesh, "Model");
-  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
+  //viewer->addPolygonMesh( mesh, "Model");
+  //viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();

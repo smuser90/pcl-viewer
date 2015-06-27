@@ -28,9 +28,14 @@
 #include <boost/timer/timer.hpp>
 
 //VTK
+#include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
+#include <vtkActor.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+
 
 // STDLIB
 #include <stdio.h>
