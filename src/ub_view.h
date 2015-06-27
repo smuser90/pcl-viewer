@@ -11,7 +11,9 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
+
 #include <pcl/surface/gp3.h>
+#include <pcl/surface/vtk_smoothing/vtk_utils.h>
 
 #include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -39,10 +41,16 @@
 extern pcl::visualization::Camera ub_camera;
 extern Eigen::Matrix4f ub_movement;
 
+extern bool mesh_colored;
+extern pcl::PolygonMesh mesh;
+extern vtkSmartPointer<vtkPolyData> raw_mesh;
+
 extern const int alpha_slider_max;
 extern int alpha_slider;
 extern double alpha, beta;
 extern cv::Mat src1, src2, dst;
+
+void color_mesh( void);
 
 // GUI
 void on_trackbar( int as, void* p);

@@ -4,24 +4,17 @@
 cv::Mat src1, src2, dst;
 pcl::visualization::Camera ub_camera;
 Eigen::Matrix4f ub_movement;
+
+
 const int alpha_slider_max = 100;
 int alpha_slider;
 double alpha, beta;
 
-/*
-void update_camera(boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer){
-  viewer->setCameraPosition(ub_movement(0,0) + ub_camera.pos[0],
-      ub_movement(0,1) + ub_camera.pos[1],
-      ub_movement(0,2) + ub_camera.pos[2],
-      ub_camera.focal[0],  ub_camera.focal[1],   ub_camera.focal[2],
-      ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
+pcl::PolygonMesh mesh;
 
-  viewer->getCameraParameters (ub_camera); // Keep camera fresh
+bool mesh_colored = false;
 
-  for(int idx = 0; idx < 3; idx++)
-    ub_movement(0, idx) = 0;
-}
-*/
+vtkSmartPointer<vtkPolyData> raw_mesh = vtkSmartPointer<vtkPolyData>::New();
 
 int
 main (int argc, char** argv)
@@ -41,16 +34,18 @@ main (int argc, char** argv)
   pcl::io::loadPCDFile ("../model.pcd", cloud_mem);
   cloud = (pcl::PointCloud<pcl::PointXYZ>::ConstPtr) &cloud_mem;
 
-  pcl::PolygonMesh mesh;
   cloud_to_mesh(cloud, mesh);
+
+  pcl::VTKUtils::convertToVTK(mesh, raw_mesh);
 
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer("Uber View"));
   viewer->setBackgroundColor( 0, 0, 0);
 
   //pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud);
   //viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb, "Model Cloud");
-  viewer->addPolygonMesh( mesh, "Model");
-  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
+  //viewer->addPolygonMesh( mesh, "Model");
+  //viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Model");
+
 
   viewer->addCoordinateSystem(0.1);
   viewer->initCameraParameters();
@@ -63,11 +58,9 @@ main (int argc, char** argv)
   char TrackbarName[50];
   sprintf( TrackbarName, "Alpha : %d", alpha_slider);
   cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
+  on_trackbar( alpha_slider, 0);
 
   while (!viewer->wasStopped ()){
-    //on_trackbar( alpha_slider, 0);
-
-    //update_camera(viewer);
 
     viewer->spinOnce(100);
 

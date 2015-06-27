@@ -1,9 +1,15 @@
 #include "ub_view.h"
 
+
 // Clear cloud
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
   for(int pt=0; pt < cloud->size(); pt++)
     set_xyz(&cloud->points[pt], 0, 0, 0);
+}
+
+// color it with heat map for now
+void color_mesh(void){
+
 }
 
 // Colors points based on height

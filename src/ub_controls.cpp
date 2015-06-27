@@ -5,7 +5,7 @@
 void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer){
   boost::shared_ptr<PCV> viewer = *static_cast<boost::shared_ptr<PCV> *> (pviewer);
 
-  if (event.getKeySym () == "w" && event.keyDown()){
+  if (event.getKeyCode () == 0x0000005d && event.keyDown()){ //Right Bracket
 
     viewer->getCameraParameters (ub_camera); // Keep camera fresh
 
@@ -33,7 +33,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
         ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
   }
 
-  if (event.getKeySym () == "s" && event.keyDown()){
+  if (event.getKeyCode () == 0x00000027 && event.keyDown()){ //Apostra
 
     viewer->getCameraParameters (ub_camera); // Keep camera fresh
 
@@ -61,7 +61,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
         ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
   }
 
-  if (event.getKeySym () == "a" && event.keyDown()){
+  if (event.getKeyCode () == 0x0000005b && event.keyDown()){ //Left Bracket
     viewer->getCameraParameters (ub_camera);
 
     Eigen::Vector3f look;
@@ -89,7 +89,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
         ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
   }
 
-  if (event.getKeySym () == "d" && event.keyDown()){
+  if (event.getKeyCode () == 0x0000005c && event.keyDown()){ // backslash
     viewer->getCameraParameters (ub_camera);
 
     Eigen::Vector3f look;
@@ -117,7 +117,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
         ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
   }
 
-  if (event.getKeySym() == "z" && event.keyDown()){
+  if (event.getKeyCode() == 0x0000002e && event.keyDown()){
     viewer->getCameraParameters (ub_camera); // Keep camera fresh
 
     double *xyz = ub_camera.pos;
@@ -146,7 +146,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
         ub_camera.view[0], ub_camera.view[1], ub_camera.view[2]);
   }
 
-  if (event.getKeySym() == "x" && event.keyDown()){
+  if (event.getKeyCode() == 0x0000002f && event.keyDown()){
     viewer->getCameraParameters (ub_camera); // Keep camera fresh
 
     double *xyz = ub_camera.pos;
@@ -176,5 +176,7 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
 
   }
 
-
+  if( event.getKeySym() == "z" && event.keyDown()){
+    if(!mesh_colored) color_mesh();
+  }
 }
