@@ -42,10 +42,11 @@
 #define BYTE 8
 #define STEP 0.005
 
-// Globals (god forgive me)
+// Globals
 extern pcl::visualization::Camera ub_camera;
 extern Eigen::Matrix4f ub_movement;
 
+extern boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 extern bool mesh_colored;
 extern pcl::PolygonMesh mesh;
 extern vtkSmartPointer<vtkPolyData> raw_mesh;
@@ -63,6 +64,9 @@ void on_trackbar( int as, void* p);
 // Controls
 void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer);
 
+// Camera
+void camera_move(char vec, int dir);
+
 // util
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
 void print_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud);
@@ -74,8 +78,7 @@ void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
 
 void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud);
 
-void reduce_to_unit(float &x, float &y, float &z);
-void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, float x, float y, float z);
+void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, Eigen::Vector3f &vec);
 
 void estimate_normals(pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> &extract_normals,
   pcl::PointCloud<pcl::Normal>::Ptr normals, pcl::search::KdTree<pcl::PointXYZ>::Ptr tree);

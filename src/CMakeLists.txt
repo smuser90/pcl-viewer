@@ -28,7 +28,7 @@ link_directories(${PCL_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 add_definitions(${BOOST_THREAD_USE_LIB})
 
-add_executable(ub-view ${SUBSYS_NAME} ub_gui.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp ub_controls.cpp)
+add_executable(ub-view ${SUBSYS_NAME} ub_camera.cpp ub_gui.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp ub_controls.cpp)
 
 target_link_libraries(ub-view ${PCL_LIBRARIES} ${Boost_LIBRARIES}
   libvtkCommon.so libvtkFiltering.so libvtkRendering.so ${OpenCV_LIBS} ${OPENNI_LIBRARIES} ${VTK_LIBRARIES})

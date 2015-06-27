@@ -67,31 +67,24 @@ void print_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
     print_point(&cloud->points[pt]);
 }
 
-void reduce_to_unit(float &x, float &y, float &z){
-  double l = sqrt(x*x + y*y  + z*z);
-  x /= l;
-  y /= l;
-  z /= l;
-}
-
-void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, float x, float y, float z){
+void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, Eigen::Vector3f &vec){
   float costheta = cos(theta_rad);
   float sintheta = sin(theta_rad);
-  reduce_to_unit(x, y, z);
+  vec.normalize();
 
   transform = Eigen::Matrix4f::Identity();
 
-  transform (0,0) = costheta + (x*x) * (1 - costheta);
-  transform (0,1) = (x * y) * (1 - costheta) - z * sintheta;
-  transform (0,2) = (x * z) * (1 - costheta) + y * sintheta;
+  transform (0,0) = costheta + (vec(0)*vec(0)) * (1 - costheta);
+  transform (0,1) = (vec(0) * vec(1)) * (1 - costheta) - vec(2) * sintheta;
+  transform (0,2) = (vec(0) * vec(2)) * (1 - costheta) + vec(1) * sintheta;
 
-  transform (1, 0) = (y * x) * (1 - costheta) + z * sintheta;
-  transform (1, 1) = costheta + (y * y) * (1 - costheta);
-  transform (1, 2) = (y * z) * (1 - costheta) + x * sintheta;
+  transform (1, 0) = (vec(1) * vec(0)) * (1 - costheta) + vec(2) * sintheta;
+  transform (1, 1) = costheta + (vec(1) * vec(1)) * (1 - costheta);
+  transform (1, 2) = (vec(1) * vec(2)) * (1 - costheta) + vec(0) * sintheta;
 
-  transform (2, 0) = (z * x) * (1 - costheta) - y * sintheta;
-  transform (2, 1) = (z * y) * (1 - costheta) + x * sintheta;
-  transform (2, 2) = costheta + (z * z) * (1 - costheta);
+  transform (2, 0) = (vec(2) * vec(0)) * (1 - costheta) - vec(1) * sintheta;
+  transform (2, 1) = (vec(2) * vec(1)) * (1 - costheta) + vec(0) * sintheta;
+  transform (2, 2) = costheta + (vec(2) * vec(2)) * (1 - costheta);
 
   transform (3, 3) = 1.0;
 }
