@@ -57,6 +57,33 @@ main (int argc, char** argv)
 
   printf("Visible Actor Count: %d\n", vtkrenderer->VisibleActorCount());
 
+  vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  colors->SetNumberOfComponents(3);
+  colors->SetName("Colors");
+
+  double bounds[6];
+  raw_mesh->GetBounds(bounds);
+
+  vtkSmartPointer<vtkLookupTable> colorLookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  colorLookupTable->SetTableRange(bounds[2], bounds[3]);
+  colorLookupTable->Build();
+
+  for(int i = 0; i < raw_mesh->GetNumberOfPoints(); i++){
+    double p[3];
+    raw_mesh->GetPoint(i,p);
+
+    double dcolor[3];
+    colorLookupTable->GetColor(p[1], dcolor);
+
+    unsigned char color[3];
+    for(int j = 0; j < 3; j++)
+      color[j] = static_cast<unsigned char>(255.0 * dcolor[j]);
+
+    colors->InsertNextTupleValue(color);
+  }
+
+  raw_mesh->GetPointData()->SetScalars(colors);
+  
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInput(raw_mesh);
 

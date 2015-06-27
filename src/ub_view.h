@@ -35,6 +35,10 @@
 #include <vtkActor.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkLookupTable.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkProperty.h>
 
 
 // STDLIB
