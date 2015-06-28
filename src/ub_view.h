@@ -20,7 +20,6 @@
 
 // OpenCV
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 // BOOST
@@ -66,17 +65,13 @@ extern bool mesh_colored;
 extern pcl::PolygonMesh mesh;
 extern vtkSmartPointer<vtkPolyData> raw_mesh;
 
-extern const int alpha_slider_max;
-extern int alpha_slider;
-extern double alpha, beta;
-extern cv::Mat src1, src2, dst;
 
 extern struct timeval last_press[10];
 
 void color_mesh( void);
 
 // GUI
-void on_trackbar( int as, void* p);
+void setup_highgui();
 
 // Controls
 void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer);

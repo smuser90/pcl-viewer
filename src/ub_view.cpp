@@ -1,15 +1,10 @@
 #include "ub_view.h"
 
 
-cv::Mat src1, src2, dst;
 pcl::visualization::Camera ub_camera;
 Eigen::Matrix4f ub_movement;
 
 boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
-
-const int alpha_slider_max = 100;
-int alpha_slider;
-double alpha, beta;
 
 pcl::PolygonMesh mesh;
 
@@ -22,9 +17,6 @@ main (int argc, char** argv)
 {
   //pack_unpack_test();
   //binary_pcd_test();
-
-  src1 = cv::imread("../viz.jpg");
-  src2 = cv::imread("../rocket.jpg");
 
   pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud;   // Most functions seem to want a const ptr
   pcl::PointCloud<pcl::PointXYZ> cloud_mem;         // Allocate on stack for now.
@@ -83,7 +75,7 @@ main (int argc, char** argv)
   }
 
   raw_mesh->GetPointData()->SetScalars(colors);
-  
+
   vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   mapper->SetInput(raw_mesh);
 
@@ -102,18 +94,12 @@ main (int argc, char** argv)
   viewer->registerKeyboardCallback(keyboard_handler, (void *)&viewer);
   viewer->getCameraParameters (ub_camera);
 
-  //cv::namedWindow("Ub-GUI", 1);
-
-  //char TrackbarName[50];
-  //sprintf( TrackbarName, "Alpha : %d", alpha_slider);
-  //cv::createTrackbar("BlendBar", "Ub-GUI", &alpha_slider, alpha_slider_max, &on_trackbar);
-  //on_trackbar( alpha_slider, 0);
+  boost::thread gui_thread(setup_highgui);
 
   while (!viewer->wasStopped ()){
-
     viewer->spinOnce(100);
 
-    boost::this_thread::sleep (boost::posix_time::microseconds ( 10000));
+    boost::this_thread::sleep (boost::posix_time::microseconds ( 1000));
   }
 
   return EXIT_SUCCESS;
