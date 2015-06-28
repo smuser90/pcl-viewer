@@ -1,5 +1,9 @@
 #include "ub_view.h"
 
+int enable_tbar = 0;
+int red_tbar = 0;
+int green_tbar = 0;
+int blue_tbar = 0;
 
 pcl::visualization::Camera ub_camera;
 Eigen::Matrix4f ub_movement;
@@ -97,8 +101,9 @@ main (int argc, char** argv)
   boost::thread gui_thread(setup_highgui);
 
   while (!viewer->wasStopped ()){
-    viewer->spinOnce(100);
+    viewer->spinOnce((int)(1000.0 / 60.0));
 
+    printf("GUI States: %d\t%d\t%d\t%d", enable_tbar, red_tbar, green_tbar, blue_tbar);
     boost::this_thread::sleep (boost::posix_time::microseconds ( 1000));
   }
 

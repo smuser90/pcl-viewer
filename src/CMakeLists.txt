@@ -27,7 +27,9 @@ link_directories(${PCL_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
 add_definitions(${PCL_DEFINITIONS})
 add_definitions(${BOOST_THREAD_USE_LIB})
-#add_definitions(-std=c++11)
+
+# Quiet gcc
+add_definitions(-w)
 
 add_executable(ub-view ${SUBSYS_NAME} ub_camera.cpp ub_gui.cpp ub_utils.cpp ub_tests.cpp ub_view.cpp ub_controls.cpp)
 

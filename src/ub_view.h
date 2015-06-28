@@ -65,6 +65,10 @@ extern bool mesh_colored;
 extern pcl::PolygonMesh mesh;
 extern vtkSmartPointer<vtkPolyData> raw_mesh;
 
+extern int enable_tbar;
+extern int red_tbar;
+extern int green_tbar;
+extern int blue_tbar;
 
 extern struct timeval last_press[10];
 
