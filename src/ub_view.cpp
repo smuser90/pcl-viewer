@@ -1,9 +1,7 @@
 #include "ub_view.h"
 
-int enable_tbar = 0;
-int red_tbar = 0;
-int green_tbar = 0;
-int blue_tbar = 0;
+int gui_states[GUIELEMENTS];
+int gui_prev_states[GUIELEMENTS];
 
 pcl::visualization::Camera ub_camera;
 Eigen::Matrix4f ub_movement;
@@ -16,11 +14,58 @@ bool mesh_colored = false;
 
 vtkSmartPointer<vtkPolyData> raw_mesh = vtkSmartPointer<vtkPolyData>::New();
 
+void print_help(){
+  printf(
+    "Uber (inter)View help:\n"
+    "\tLoad PCD File:\n"
+    "\t\t This program takes a single .pcd filename at startup.\n"
+    "\t\t Use -f flag.\n\n"
+    "\tMovement:\n"
+    "\t\t This program provides translational movement along the camera\'s local xyz.\n"
+    "\t\t \'[\' Move left.\n"
+    "\t\t \'\\\' Move right.\n"
+    "\t\t \']\' Move forward.\n"
+    "\t\t \'Apostra\' Move backward.\n"
+    "\t\t \'Period\' Move down.\n"
+    "\t\t \'Period\' Move up.\n\n"
+    "\tView:\n"
+    "\t\t Click and drag to rotate the camera around the viewpoint.\n"
+    "\t\t Use p,w,s keys for point, wire, and solid representations respectively.\n"
+    "\t\t A geometry mesh is generated from the point cloud data on program start.\n\n"
+    "\tColor:\n"
+    "\t\t Use the trackbars to change cloud coloring options.\n"
+    "\t\t Coloring style to use is picked top down.\n"
+    "\t\t The first view enabled will be used.\n\n"
+    "\tThanks for using ub-view!\n"
+  );
+}
 int
 main (int argc, char** argv)
 {
   //pack_unpack_test();
   //binary_pcd_test();
+
+  char *pcd_file = NULL;
+  int char c;
+
+  while ((c = getopt (argc, argv, "hf:")) != -1){
+    switch c
+    {
+        case 'h':
+          print_help();
+          break;
+        case 'f':
+          pcd_file = optarg;
+          break;
+        default:
+          break;
+    }
+  }
+
+  if(pcd_file == NULL){
+    printf("Sorry, no file provided. Use -f [file] argument.\n");
+    return EXIT_FAILURE;
+  }
 
   pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud;   // Most functions seem to want a const ptr
   pcl::PointCloud<pcl::PointXYZ> cloud_mem;         // Allocate on stack for now.
@@ -47,11 +92,8 @@ main (int argc, char** argv)
   pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud_rgb);
   viewer->addPointCloud<pcl::PointXYZRGB>(cloud_rgb, rgb, "Model Cloud");
 
-  printf("Acquiring PCL's vtkrenderwindow\n");
   vtkSmartPointer<vtkRenderWindow> vtkrender_window = viewer->getRenderWindow();
   vtkSmartPointer<vtkRenderer> vtkrenderer = vtkrender_window->GetRenderers()->GetFirstRenderer();
-
-  printf("Visible Actor Count: %d\n", vtkrenderer->VisibleActorCount());
 
   vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
   colors->SetNumberOfComponents(3);
@@ -101,9 +143,11 @@ main (int argc, char** argv)
   boost::thread gui_thread(setup_highgui);
 
   while (!viewer->wasStopped ()){
+    viewer->setBackgroundColor( gui_states[1] / 255.0, gui_states[2] / 255.0, gui_states[3] / 255.0);
     viewer->spinOnce((int)(1000.0 / 60.0));
 
-    printf("GUI States: %d\t%d\t%d\t%d", enable_tbar, red_tbar, green_tbar, blue_tbar);
+
+    //printf("GUI States: %d\t%d\t%d\t%d", enable_tbar, red_tbar, green_tbar, blue_tbar);
     boost::this_thread::sleep (boost::posix_time::microseconds ( 1000));
   }
 

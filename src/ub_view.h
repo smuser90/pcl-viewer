@@ -55,6 +55,7 @@
 #define BYTE 8
 #define STEP 0.005
 #define PRESSPERSEC 15
+#define GUIELEMENTS 10
 
 // Globals
 extern pcl::visualization::Camera ub_camera;
@@ -65,10 +66,7 @@ extern bool mesh_colored;
 extern pcl::PolygonMesh mesh;
 extern vtkSmartPointer<vtkPolyData> raw_mesh;
 
-extern int enable_tbar;
-extern int red_tbar;
-extern int green_tbar;
-extern int blue_tbar;
+extern int gui_states[GUIELEMENTS];
 
 extern struct timeval last_press[10];
 

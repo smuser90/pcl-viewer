@@ -2,15 +2,17 @@
 
 #define PACKINGPOINTS 5
 
+// Getting rgb data out of float requires some shift-masking
+// Make sure we did that right
 void pack_unpack_test(void){
+
+  // Initialize cloud
   pcl::PointCloud<pcl::PointXYZRGB> cloud;
   cloud.points.resize (PACKINGPOINTS);
   cloud.width = PACKINGPOINTS;
   cloud.height = 1;
 
-  //Initialize cloud
   for(int pt = 0; pt < cloud.size(); pt++){
-    //cloud.points[pt].id = pt+100;
     set_xyz(&cloud.points[pt], pt+1, pt+1, pt+1);
     pack_rgb(&cloud.points[pt] , colors[pt % ARRAY_LENGTH(colors)]);
   }
@@ -18,7 +20,9 @@ void pack_unpack_test(void){
   // Save the file
   pcl::io::savePCDFile ("pack_unpack.pcd", cloud);
 
+  // Data? What data
   clear_cloud(&cloud);
+
   // Load it back from disk
   pcl::io::loadPCDFile ("pack_unpack.pcd", cloud);
 
@@ -27,11 +31,11 @@ void pack_unpack_test(void){
   }
 }
 
+// Make sure we can load colorless files into rgb clouds.
 void binary_pcd_test(void){
   pcl::PointCloud<pcl::PointXYZRGB> cloud;
 
   // Load binary encoded non-rgb point cloud
   pcl::io::loadPCDFile ("../model.pcd", cloud);
   print_cloud(&cloud);
-
 }
