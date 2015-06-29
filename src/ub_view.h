@@ -54,7 +54,7 @@
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 #define BYTE 8
 #define STEP 0.005
-#define PRESSPERSEC 15
+#define PRESSPERSEC 8
 #define GUIELEMENTS 10
 
 // Globals
@@ -62,15 +62,10 @@ extern pcl::visualization::Camera ub_camera;
 extern Eigen::Matrix4f ub_movement;
 
 extern boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
-extern bool mesh_colored;
-extern pcl::PolygonMesh mesh;
-extern vtkSmartPointer<vtkPolyData> raw_mesh;
 
 extern int gui_states[GUIELEMENTS];
 
 extern struct timeval last_press[10];
-
-void color_mesh( void);
 
 // GUI
 void setup_highgui();
@@ -91,7 +86,8 @@ void pack_rgb(pcl::PointXYZRGB *p, uint8_t rgb[3]);
 void unpack_rgb(pcl::PointXYZRGB *p, uint8_t (&rgb)[3]);
 void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
 
-void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud);
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis);
+void color_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh);
 
 void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, Eigen::Vector3f &vec);
 

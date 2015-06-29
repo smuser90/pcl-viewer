@@ -62,7 +62,6 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
   }
 
   if( event.getKeySym() == "z" && event.keyDown()){
-    if(!mesh_colored)
-      color_mesh();
+    // face_origin()
   }
 }

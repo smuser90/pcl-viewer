@@ -7,13 +7,37 @@ void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
     set_xyz(&cloud->points[pt], 0, 0, 0);
 }
 
-// color it with heat map for now
-void color_mesh(void){
+void color_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh /*, pcl::PointCloud<PointXYZRGB> parent |Color it from the parent cloud */){
+  vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  colors->SetNumberOfComponents(3);
+  colors->SetName("Colors");
 
+  double bounds[6];
+  raw_mesh->GetBounds(bounds);
+
+  vtkSmartPointer<vtkLookupTable> colorLookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  colorLookupTable->SetTableRange(bounds[2], bounds[3]);
+  colorLookupTable->Build();
+
+  for(int i = 0; i < raw_mesh->GetNumberOfPoints(); i++){
+    double p[3];
+    raw_mesh->GetPoint(i,p);
+
+    double dcolor[3];
+    colorLookupTable->GetColor(p[1], dcolor);
+
+    unsigned char color[3];
+    for(int j = 0; j < 3; j++)
+      color[j] = static_cast<unsigned char>(255.0 * dcolor[j]);
+
+    colors->InsertNextTupleValue(color);
+  }
+
+  raw_mesh->GetPointData()->SetScalars(colors);
 }
 
 // Colors points based on height
-void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud){
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis){
   pcl::PointXYZRGB max, min;
   pcl::getMinMax3D( cloud, min, max);
 
@@ -24,7 +48,21 @@ void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud){
 
   for(int pt = 0; pt < cloud.size(); pt++){
 
-    float percent_range = ((max.y - cloud.points[pt].y) / range);
+    float percent_range;
+    switch(axis){
+      case 0:
+        percent_range = ((max.x - cloud.points[pt].x) / range);
+        break; // x
+
+      case 1:
+        percent_range = ((max.y - cloud.points[pt].y) / range);
+        break; // y
+
+      case 2:
+        percent_range = ((max.z - cloud.points[pt].z) / range);
+        break; // z
+    }
+
     clr[0] = clr_max[0] * percent_range;
     clr[1] = clr_min[1] * (1 - percent_range);
 
