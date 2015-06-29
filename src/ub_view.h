@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <cfloat>
+#include <ctime>
 #include <cmath>
 #include <iostream>
 
@@ -53,9 +54,18 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 #define BYTE 8
+
 #define STEP 0.005
+
 #define PRESSPERSEC 8
+
 #define GUIELEMENTS 10
+
+#define GUIRED 0
+#define GUIGREEN 1
+#define GUIBLUE 2
+#define GUIHEATMAP 3
+#define GUIXYZ 4
 
 // Globals
 extern pcl::visualization::Camera ub_camera;
@@ -63,12 +73,20 @@ extern Eigen::Matrix4f ub_movement;
 
 extern boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 
+extern vtkSmartPointer<vtkUnsignedCharArray> vtk_colors;
+extern vtkSmartPointer<vtkLookupTable> vtk_colorLookupTable;
+
 extern int gui_states[GUIELEMENTS];
 
 extern struct timeval last_press[10];
 
+void save_file();
+void print_help(bool pcl);
+void mesh_cloud();
+
 // GUI
 void setup_highgui();
+void reset_view();
 
 // Controls
 void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pviewer);
@@ -86,8 +104,10 @@ void pack_rgb(pcl::PointXYZRGB *p, uint8_t rgb[3]);
 void unpack_rgb(pcl::PointXYZRGB *p, uint8_t (&rgb)[3]);
 void set_xyz(pcl::PointXYZRGB *p, float x, float y, float z);
 
-void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis);
-void color_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh);
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis, vtkSmartPointer<vtkPolyData> vtk_mesh);
+void heat_map_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh, int axis);
+void color_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh, uint8_t rgb[3]);
+void color_cloud(pcl::PointCloud<pcl::PointXYZRGB> &cloud, uint8_t rgb[3]);
 
 void arb_rotate(Eigen::Matrix4f &transform, double theta_rad, Eigen::Vector3f &vec);
 
@@ -101,14 +121,5 @@ void cloud_to_mesh(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, pcl::PolygonM
 // tests
 void pack_unpack_test(void);
 void binary_pcd_test(void);
-
-// globals
-static uint8_t colors[5][3] = {
-  {255, 128, 0},
-  {0, 255, 128},
-  {128, 0, 255},
-  {100, 100, 100},
-  {200, 200, 200}
-};
 
 #endif

@@ -2,72 +2,89 @@
 
 
 // Clear cloud
+
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
   for(int pt=0; pt < cloud->size(); pt++)
     set_xyz(&cloud->points[pt], 0, 0, 0);
 }
 
-void color_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh /*, pcl::PointCloud<PointXYZRGB> parent |Color it from the parent cloud */){
-  vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-  colors->SetNumberOfComponents(3);
-  colors->SetName("Colors");
+void color_cloud(pcl::PointCloud<pcl::PointXYZRGB> &cloud, uint8_t rgb[3]){
+  for(int pt = 0; pt < cloud.size(); pt++){
+    pack_rgb(&cloud.points[pt], rgb);
+  }
+}
 
+void color_vtkmesh(vtkSmartPointer<vtkPolyData> vtk_mesh, uint8_t rgb[3]){
+  vtk_colors->Resize(0);
+  for(int i = 0; i < vtk_mesh->GetNumberOfPoints(); i++){
+    vtk_colors->InsertNextTupleValue(rgb);
+  }
+
+  vtk_mesh->GetPointData()->SetScalars(vtk_colors);
+}
+
+void heat_map_vtkmesh(vtkSmartPointer<vtkPolyData> raw_mesh, int axis /*, pcl::PointCloud<PointXYZRGB> parent |Color it from the parent cloud */){
   double bounds[6];
   raw_mesh->GetBounds(bounds);
 
-  vtkSmartPointer<vtkLookupTable> colorLookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  colorLookupTable->SetTableRange(bounds[2], bounds[3]);
-  colorLookupTable->Build();
+  vtk_colors->Resize(0);
+
+  vtk_colorLookupTable->SetTableRange(bounds[axis*2], bounds[axis*2+1]);
+  vtk_colorLookupTable->Build();
 
   for(int i = 0; i < raw_mesh->GetNumberOfPoints(); i++){
     double p[3];
     raw_mesh->GetPoint(i,p);
 
     double dcolor[3];
-    colorLookupTable->GetColor(p[1], dcolor);
+    vtk_colorLookupTable->GetColor(p[axis], dcolor);
 
     unsigned char color[3];
     for(int j = 0; j < 3; j++)
       color[j] = static_cast<unsigned char>(255.0 * dcolor[j]);
 
-    colors->InsertNextTupleValue(color);
+    vtk_colors->InsertNextTupleValue(color);
   }
 
-  raw_mesh->GetPointData()->SetScalars(colors);
+  raw_mesh->GetPointData()->SetScalars(vtk_colors);
 }
 
 // Colors points based on height
-void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis){
-  pcl::PointXYZRGB max, min;
-  pcl::getMinMax3D( cloud, min, max);
+void heat_map(pcl::PointCloud<pcl::PointXYZRGB> &cloud, int axis, vtkSmartPointer<vtkPolyData> vtk_mesh){
+  heat_map_vtkmesh(vtk_mesh, axis); // This initializes the colorlookuptable & colors the mesh
 
-  float range = max.y - min.y;
-  uint8_t clr_max[3] = {255, 0, 0};
-  uint8_t clr_min[3] = {0, 255, 0};
-  uint8_t clr[3] = {0, 0, 0};
+  pcl::PointXYZRGB *p;
+  double color[3];
+  uint8_t clr[3];
 
   for(int pt = 0; pt < cloud.size(); pt++){
+    p = &cloud.points[pt];
+    float val = 0.0;
 
-    float percent_range;
     switch(axis){
       case 0:
-        percent_range = ((max.x - cloud.points[pt].x) / range);
+        val = p->x;
         break; // x
 
       case 1:
-        percent_range = ((max.y - cloud.points[pt].y) / range);
+        val = p->y;
         break; // y
 
       case 2:
-        percent_range = ((max.z - cloud.points[pt].z) / range);
+        val = p->z;
         break; // z
     }
 
-    clr[0] = clr_max[0] * percent_range;
-    clr[1] = clr_min[1] * (1 - percent_range);
+    vtk_colorLookupTable->GetColor(val, color);
+
+    clr[0] = (uint8_t)(color[0] * 255.0);
+    clr[1] = (uint8_t)(color[1] * 255.0);
+    clr[2] = (uint8_t)(color[2] * 255.0);
 
     pack_rgb( &cloud.points[pt], clr);
   }
+
+
 }
 
 // Pack bytes into float (allegedly helps with SSE performance)
@@ -142,10 +159,10 @@ void stitch_mesh(pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud, pcl::Polyg
 
   pcl::GreedyProjectionTriangulation<pcl::PointNormal> stitch;
 
-  stitch.setSearchRadius(0.05);
+  stitch.setSearchRadius(2);
   stitch.setMu (2.5);
-  stitch.setMaximumNearestNeighbors (200);
-  stitch.setMaximumSurfaceAngle(M_PI / 4);
+  stitch.setMaximumNearestNeighbors (300);
+  stitch.setMaximumSurfaceAngle(M_PI / 2);
   stitch.setMinimumAngle(M_PI / 18);
   stitch.setMaximumAngle(2 * M_PI / 3);
   stitch.setNormalConsistency(false);

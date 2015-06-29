@@ -61,7 +61,25 @@ void keyboard_handler(const pcl::visualization::KeyboardEvent &event, void* pvie
 
   }
 
-  if( event.getKeySym() == "z" && event.keyDown()){
-    // face_origin()
+  if( event.getKeySym() == "r" && event.keyDown()){
+    reset_view();
   }
+
+  if( event.getKeySym() == "m" && event.keyDown()){
+    mesh_cloud();
+  }
+
+  if( event.getKeySym() == "h" && event.keyDown()){
+    print_help(true);
+  }
+
+  if( event.getKeySym() == "q" && event.keyDown()){
+    exit(EXIT_SUCCESS);
+  }
+
+  if( event.getKeySym() == "z" && event.keyDown()){
+    save_file();
+  }
+
+
 }

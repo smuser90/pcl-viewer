@@ -2,6 +2,14 @@
 
 #define PACKINGPOINTS 5
 
+static uint8_t colors[5][3] = {
+  {255, 128, 0},
+  {0, 255, 128},
+  {128, 0, 255},
+  {100, 100, 100},
+  {200, 200, 200}
+};
+
 // Getting rgb data out of float requires some shift-masking
 // Make sure we did that right
 void pack_unpack_test(void){
