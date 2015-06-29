@@ -41,7 +41,7 @@ void print_help(bool pcl = false){
     "\t\t This program takes a single .pcd filename at startup.\n"
     "\t\t Use -f flag.\n\n"
     "\tSave PCD snapshot:\n"
-    "\t\t  'z' Save the current view to snapshot file in `pwd`."
+    "\t\t  'z' Save the current view to snapshot file in `pwd`.\n"
     "\tMovement:\n"
     "\t\t This program provides translational movement along the camera\'s local xyz.\n"
     "\t\t \'[\' Move left.\n"
