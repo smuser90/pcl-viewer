@@ -1,0 +1,68 @@
+References:
+     http://docs.pointclouds.org/trunk/
+     http://pointclouds.org/documentation/tutorials/
+     https://github.com/PointCloudLibrary/pcl
+     http://www.pcl-developers.org/
+     http://docs.opencv.org/modules/refman.html
+     http://docs.opencv.org/doc/tutorials/tutorials.html
+     http://ramsrigoutham.com/2012/06/28/integrating-pcl-and-opencv-passthrough-filter-example/
+
+Straight forward for WASD movement. View rotation (yaw) will require matrix ops. 
+Doesn't look like there are utils to form rotation matrices that opengl has. Don't want to waste time slipping up on the math. Maybe I can find something that will port easily. 
+NOTE: If I do implement camera rotation, need to reduce components to unit vectors. DON'T FORGET
+
+Implementing file load & save will be easy due to amount of code out there for reference. 
+
+Why use opencv at all? HighGUI I suppose for quick control dev (sliders, buttons, etc). Looks like it draws primitives too! 
+Has massive amount of features though… save for later date
+Confirmed -  we are just going to use opencv for gui elements, PCLVisualizer has about everything we could want for rendering. 
+
+GOTCHA: For point picking events to work shift must be held down
+
+Heat map for the height sounds pretty cool:
+     -Need min & max z. Assuming points are mostly evenly distributed. Green -> Yellow -> Red
+
+Being able to create a mesh would be great too. Can use 'greedy projection triangle' stitching algorithm built into pcl. 
+
+Finally we want to color the cloud with a user defined rgb value. 
+
+So for height heat map:
+     Need to compute a smooth gradient from range_min.y -> range_max.y 
+     Two gradients actually, 0-50% is purple to green, 51-100% is green to red;
+     full range = max.y - min.y
+     this range = max.y - point.y
+     percent range = (this range / full range) * 100 
+
+Okay thats implemented. Now would be a good time to do camera motion
+Need an internal 3x3 camera matrix for position, look, and up data. 
+“WASD” motion is just x, y translation. 15 minutes to add. z translation linked to 'z' (up) and ctrl (down)
+get camera ‘up’ axis from pos + (pos + up), given up is a unit vector
+
+To avoid rounding issues to debug will not be implementing pitch and roll camera motion. 
+
+Future thoughts:
+     We want to support multiple point clouds (do we?) so we will need a class to keep track of them. We also want to have multiple meshes, object that holds both and displays one or the other. 
+
+Save Video:
+     Lets just log every update to the camera matrix with time data so a ‘movie’ is just a replay… thats what super smash bros did right?
+
+KeyboardEvent type does not have access to a ‘held down’ state. Going to have to make a ‘fly’ routine that runs until button is lifted. 
+
+Getting a less than ideal mesh generated from greedy triangulation. If I had time I would get analytics off the point cloud regarding maximum distance between points, avg distance, etc to tune the mesh generation. Quick and dirty method is to add slider controls in gui to let user tweak this themselves (3 controls)... Or leave it how it is. Hey there *are* surfaces there. 
+
+"WASD" keys conflict with pcl reservations. Moving assignments to "]['\" & "./" keys for movement. 
+Key handler is pushing move updates faster than view can draw, I need to put timing checks on key press events to not overload the view update. 
+Setting this to something conservative like ... 5 steps a second.
+
+If you build with -std=c++11 program segfaults off the bat. Lots a couple minutes there. 
+
+Adding in gui is being the pain I expected it to be. If I had more time I would have started them both together instead of integrate like this. 
+Toiled installing Qt but getting unstable behavior. Gonna stick with OpenCV's highgui for now. 
+
+Had to put OpenCV gui on its own thread, looks like it locks it up polling for keystrokes. Sharing global variables between the threads, main thread is read only, gui thread is write only. No need for mutexes, thank you. 
+
+For colored mesh creation, looks like pclvisualizer does not have the ability to render colored polygon mesh. 
+As a workaround I can grab the underlying vtk renderer from pclvisualizer and handle the rendering of the mesh myself. 
+Hopefully things don't get out of sync. To simplify the mesh is only colored once when user presses 'm'.  
+
+Scrapping camera rotation - not enough time. 

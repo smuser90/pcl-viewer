@@ -53,6 +53,7 @@ void print_help(bool pcl = false){
     "\tView:\n"
     "\t\t Click and drag to rotate the camera around the viewpoint.\n"
     "\t\t Use p,w,s keys for point, wire, and solid representations respectively.\n"
+    "\t\t r key resets view to program start.\n"
     "\tColor:\n"
     "\t\t Use the trackbars to change cloud coloring options.\n"
     "\t\t Coloring style to use is picked top down.\n"
@@ -70,7 +71,7 @@ void print_help(bool pcl = false){
 void reset_view(){
   double bounds[6];
   vtk_mesh->GetBounds(bounds);
-  viewer->setCameraPosition(0, 0, 0, 0, 0, 0, 0.0, 1.0, 0.0);
+  viewer->setCameraPosition(bounds[1]*1.2, 0, bounds[5] * 1.2, 0, 0, 0, 0.0, 1.0, 0.0);
 }
 
 void initialize_view(){
@@ -79,7 +80,7 @@ void initialize_view(){
 
   viewer->setBackgroundColor( 0.2, 0.3, 0.4);
   viewer->initCameraParameters();
-  viewer->setCameraPosition(bounds[1]*1.2, 0, bounds[5] * 1.2, 0, 0, 0, 0.0, 1.0, 0.0);
+  viewer->setCameraPosition(0.1, 0, 0.1, 0, 0, 0, 0.0, 1.0, 0.0);
   viewer->registerKeyboardCallback(keyboard_handler, (void *)&viewer);
   viewer->getCameraParameters (ub_camera);
 }
@@ -104,11 +105,11 @@ void parse_arguments(int argc, char **argv){
 }
 
 bool heat_map_on(){
-  return ((gui_states[GUIHEATMAP] != gui_prev_states[GUIHEATMAP]) && (gui_states[GUIHEATMAP] == 1)) || (gui_states[GUIHEATMAP] == 1 && gui_states[GUIXYZ] != gui_prev_states[GUIXYZ]);
+  return ((gui_states[GUIHEATMAP] != gui_prev_states[GUIHEATMAP]) && (gui_states[GUIHEATMAP] == 1)) || (gui_states[GUIHEATMAP] == 1 && gui_states[GUIXYZ] != gui_prev_states[GUIXYZ]) || ((meshed ==1) && (gui_states[GUIHEATMAP] == 1));
 }
 
 bool color_changed(){
-  return (gui_states[GUIRED] != gui_prev_states[GUIRED]) || (gui_states[GUIGREEN] != gui_prev_states[GUIGREEN]) || (gui_states[GUIBLUE] != gui_prev_states[GUIBLUE]);
+  return (gui_states[GUIRED] != gui_prev_states[GUIRED]) || (gui_states[GUIGREEN] != gui_prev_states[GUIGREEN]) || (gui_states[GUIBLUE] != gui_prev_states[GUIBLUE]) || ((meshed ==1) && (gui_states[GUIHEATMAP] == 0));
 
 }
 
@@ -170,7 +171,7 @@ void run_loop(){
 
     update_view();
 
-    viewer->spinOnce((int)(1000.0 / 60.0)); // 60 fps (not really, we didn't account for how long we were just working)
+    viewer->spinOnce((int)(1000.0 / 60.0));
 
     boost::this_thread::sleep (boost::posix_time::microseconds ( 100));
   }

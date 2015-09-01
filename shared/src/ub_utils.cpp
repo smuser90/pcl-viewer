@@ -2,6 +2,7 @@
 
 
 // Clear cloud
+
 void clear_cloud(pcl::PointCloud<pcl::PointXYZRGB> *cloud){
   for(int pt=0; pt < cloud->size(); pt++)
     set_xyz(&cloud->points[pt], 0, 0, 0);

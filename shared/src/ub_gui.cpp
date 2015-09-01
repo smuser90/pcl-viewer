@@ -11,7 +11,7 @@ void gui_refresh(int a, void *p){
 void setup_highgui(){
   cv::namedWindow(UVTITLE, 0);
 
-  logo = cv::imread("uber.jpg");
+  logo = cv::imread("../uber.jpg");
   cv::createTrackbar("Red:       ", UVTITLE, &gui_states[GUIRED], 255, gui_refresh);
   cv::createTrackbar("Green:     ", UVTITLE, &gui_states[GUIGREEN], 255, gui_refresh);
   cv::createTrackbar("Blue:      ", UVTITLE, &gui_states[GUIBLUE], 255, gui_refresh);
